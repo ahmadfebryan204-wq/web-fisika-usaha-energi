@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Praktikum 04 — Usaha dan Energi: Sepeda di Jalan Menurun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-badge">
+        <div class="badge-icon" aria-hidden="true">🚲</div>
+        <div>
+          <span class="badge-subtitle">LABORATORIUM VIRTUAL FISIKA</span>
+          <h1 class="badge-title">Praktikum 04 — Usaha dan Energi</h1>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="btnResetDefault" class="btn-pill btn-accent" title="Kembalikan nilai sesuai Contoh Soal">
+          ↺ Reset ke Contoh Soal
+        </button>
+        <button id="btnRecordTrial" class="btn-pill btn-success" title="Simpan data percobaan saat ini ke tabel">
+          ＋ Catat Hasil Percobaan
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- SECTION 1: MAIN ILLUSTRATION & INTERACTIVE SIMULATION -->
+    <section class="card-section" aria-label="Simulasi Sepeda di Jalan Menurun">
+      <div class="board-header">
+        <div class="header-tag">SIMULASI INTERAKTIF</div>
+        <h2 class="board-title">SEPEDA DI JALAN MENURUN</h2>
+        <p class="board-subtitle">Analisis Energi Potensial, Energi Kinetik, Energi Mekanik, dan Usaha Gravitasi</p>
+      </div>
+
+      <!-- Simulation Controls Bar -->
+      <div class="sim-toolbar">
+        <div class="sim-buttons">
+          <button id="btnPlayPause" class="btn-sim btn-primary">
+            <span id="playIcon">▶</span> <span id="playText">Mulai Meluncur</span>
+          </button>
+          <button id="btnRestartSim" class="btn-sim btn-outline">
+            ⏮ Ulangi Posisi
+          </button>
+          <label class="toggle-ghost">
+            <input type="checkbox" id="chkShowPoses" checked />
+            <span>Tampilkan 3 Posisi Fase</span>
+          </label>
+        </div>
+
+        <div class="sim-scrubber">
+          <label for="progressSlider">Posisi Lintasan:</label>
+          <input type="range" id="progressSlider" min="0" max="100" step="0.5" value="0" />
+          <span id="phaseBadge" class="phase-pill phase-top">1. Di Atas</span>
+        </div>
+
+        <div class="sim-speed">
+          <label for="simSpeedSelect">Kecepatan Animasi:</label>
+          <select id="simSpeedSelect">
+            <option value="0.5">0.5x (Lambat)</option>
+            <option value="1" selected>1.0x (Normal)</option>
+            <option value="1.5">1.5x (Cepat)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Canvas & Live Instantaneous Telemetry Wrapper -->
+      <div class="canvas-stage-wrapper">
+        <div class="canvas-box">
+          <canvas id="simCanvas" width="980" height="390"></canvas>
+        </div>
+
+        <!-- Real-time Energy Bars & Instantaneous Status -->
+        <aside class="live-telemetry">
+          <div class="telemetry-header">
+            <h3>Status Saat Ini di Lintasan</h3>
+            <span id="livePosLabel" class="telemetry-sub">Fase 1: Di Atas Puncak</span>
+          </div>
+
+          <div class="instant-metrics">
+            <div class="metric-chip">
+              <span class="m-label">Ketinggian (h)</span>
+              <strong id="liveH">4,20 m</strong>
+            </div>
+            <div class="metric-chip">
+              <span class="m-label">Kelajuan (v)</span>
+              <strong id="liveV">4,00 m/s</strong>
+            </div>
+          </div>
+
+          <div class="energy-bars">
+            <div class="ebar-item">
+              <div class="ebar-top">
+                <span class="ebar-name"><span class="dot dot-ep"></span>Energi Potensial (Ep)</span>
+                <strong id="liveEP">3.360 J</strong>
+              </div>
+              <div class="ebar-track"><div id="barEP" class="ebar-fill fill-ep" style="width: 84%"></div></div>
+            </div>
+
+            <div class="ebar-item">
+              <div class="ebar-top">
+                <span class="ebar-name"><span class="dot dot-ek"></span>Energi Kinetik (Ek)</span>
+                <strong id="liveEK">640 J</strong>
+              </div>
+              <div class="ebar-track"><div id="barEK" class="ebar-fill fill-ek" style="width: 16%"></div></div>
+            </div>
+
+            <div class="ebar-item">
+              <div class="ebar-top">
+                <span class="ebar-name"><span class="dot dot-em"></span>Energi Mekanik (Em)</span>
+                <strong id="liveEM">4.000 J</strong>
+              </div>
+              <div class="ebar-track"><div id="barEM" class="ebar-fill fill-em" style="width: 100%"></div></div>
+            </div>
+
+            <div class="ebar-item ebar-total">
+              <div class="ebar-top">
+                <span class="ebar-name"><span class="dot dot-work"></span>Usaha Gravitasi (Wg)</span>
+                <strong id="liveWg">0 J</strong>
+              </div>
+              <div class="ebar-track"><div id="barWg" class="ebar-fill fill-work" style="width: 0%"></div></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- 3 Phase Explanation Cards matching the Canva slide -->
+      <div class="phase-cards-grid">
+        <article class="phase-card card-warm" id="cardPhase1" data-jump="0">
+          <div class="phase-card-head">
+            <h3>Di atas</h3>
+            <span class="jump-hint">Klik untuk lihat posisi</span>
+          </div>
+          <p>Energi potensial lebih besar karena posisinya lebih tinggi.</p>
+          <div class="phase-live-summary">
+            <span><strong>h1</strong> = <em id="card1H">4,2 m</em></span>
+            <span><strong>v1</strong> = <em id="card1V">4 m/s</em></span>
+            <span><strong>Ep1</strong> = <em id="card1EP">3.360 J</em></span>
+            <span><strong>Ek1</strong> = <em id="card1EK">640 J</em></span>
+          </div>
+        </article>
+
+        <article class="phase-card card-blue" id="cardPhase2" data-jump="62">
+          <div class="phase-card-head">
+            <h3>Saat meluncur</h3>
+            <span class="jump-hint">Klik untuk lihat posisi</span>
+          </div>
+          <p>Gravitasi melakukan usaha positif. Energi kinetik bertambah.</p>
+          <div class="phase-live-summary">
+            <span><strong>Wg</strong> = <em id="card2Wg">3.360 J</em></span>
+            <span><strong>v2</strong> = <em id="card2V2">10 m/s</em></span>
+            <span><strong>Ek2</strong> = <em id="card2EK2">4.000 J</em></span>
+          </div>
+        </article>
+
+        <article class="phase-card card-warm" id="cardPhase3" data-jump="100">
+          <div class="phase-card-head">
+            <h3>Saat direm</h3>
+            <span class="jump-hint">Klik untuk lihat posisi</span>
+          </div>
+          <p>Sepeda melambat di jalan datar (h2 = 0 m), sehingga energi kinetik akhirnya berkurang.</p>
+          <div class="phase-live-summary">
+            <span><strong>h2</strong> = <em>0 m</em></span>
+            <span><strong>v3</strong> = <em id="card3V3">5 m/s</em></span>
+            <span><strong>Ek3</strong> = <em id="card3EK3">1.000 J</em></span>
+          </div>
+        </article>
+      </div>
+
+      <div class="board-footer">
+        <p class="concept-ref">Acuan konsep: OpenStax, Physics Lab Manual, Gambar 7.1 dan College Physics 2e, §7.5.</p>
+      </div>
+    </section>
+
+    <!-- SECTION 2: TWO-WAY EXPERIMENT INPUTS & CONTOH SOAL -->
+    <div class="experiment-grid">
+      <!-- Left Column: Input Controls -->
+      <section class="card-section panel-inputs" aria-label="Panel Input Percobaan">
+        <div class="section-header-bar">
+          <span class="section-tag">KONTROL PARAMETER</span>
+          <h2 class="section-heading">Panel Percobaan Interaktif</h2>
+          <p class="panel-intro">
+            Ubah nilai besaran fisika yang diketahui atau ketik langsung nilai energinya. Perhitungan di sebelah kanan dan simulasi di atas akan otomatis diperbarui.
+          </p>
+        </div>
+
+        <!-- Preset Quick Scenarios -->
+        <div class="preset-bar">
+          <span class="preset-label">Skenario Cepat:</span>
+          <button type="button" class="chip-btn active" data-preset="soal">Contoh Soal (Default)</button>
+          <button type="button" class="chip-btn" data-preset="diam">Mulai dari Diam (v1 = 0)</button>
+          <button type="button" class="chip-btn" data-preset="berhenti">Berhenti di Akhir (v3 = 0)</button>
+          <button type="button" class="chip-btn" data-preset="curam">Turunan Tinggi (h1 = 8 m)</button>
+        </div>
+
+        <!-- Sub-panel A: Input Besaran Fisika yang Diketahui -->
+        <div class="input-group-card">
+          <div class="ig-header">
+            <h3>1. Besaran Fisika yang Diketahui</h3>
+            <span class="ig-badge">Variabel Utama</span>
+          </div>
+
+          <div class="fields-grid">
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpMass">Massa Total (m)</label>
+                <span class="unit-tag">kg</span>
+              </div>
+              <div class="field-control-row">
+                <input type="number" id="inpMass" min="1" max="500" step="1" value="80" />
+                <input type="range" id="rngMass" min="10" max="200" step="1" value="80" />
+              </div>
+            </div>
+
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpHeight">Ketinggian di Puncak (h1)</label>
+                <span class="unit-tag">m</span>
+              </div>
+              <div class="field-control-row">
+                <input type="number" id="inpHeight" min="0" max="100" step="0.1" value="4.2" />
+                <input type="range" id="rngHeight" min="0" max="20" step="0.1" value="4.2" />
+              </div>
+            </div>
+
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpV1">Kelajuan Awal di Puncak (v1)</label>
+                <span class="unit-tag">m/s</span>
+              </div>
+              <div class="field-control-row">
+                <input type="number" id="inpV1" min="0" max="100" step="0.1" value="4" />
+                <input type="range" id="rngV1" min="0" max="25" step="0.1" value="4" />
+              </div>
+            </div>
+
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpV3">Kelajuan Akhir Setelah Direm (v3)</label>
+                <span class="unit-tag">m/s</span>
+              </div>
+              <div class="field-control-row">
+                <input type="number" id="inpV3" min="0" max="100" step="0.1" value="5" />
+                <input type="range" id="rngV3" min="0" max="25" step="0.1" value="5" />
+              </div>
+            </div>
+
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpG">Percepatan Gravitasi (g)</label>
+                <span class="unit-tag">m/s²</span>
+              </div>
+              <div class="field-control-row">
+                <input type="number" id="inpG" min="1" max="30" step="0.1" value="10" />
+                <div class="g-quick">
+                  <button type="button" class="mini-btn" data-g="10">10</button>
+                  <button type="button" class="mini-btn" data-g="9.8">9,8</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpV2">Kelajuan di Dasar Sblm Direm (v2)</label>
+                <span class="unit-tag">m/s</span>
+              </div>
+              <div class="field-control-row">
+                <input type="number" id="inpV2" min="0" max="200" step="0.1" value="10" />
+                <span class="helper-note">Otomatis menghitung h1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-panel B: Input Langsung Nilai Energi -->
+        <div class="input-group-card energy-direct-card">
+          <div class="ig-header">
+            <h3>2. Input Langsung Nilai Energi &amp; Usaha</h3>
+            <span class="ig-badge badge-energy">Kalkulator 2 Arah (Joule)</span>
+          </div>
+          <p class="ig-desc">
+            Anda juga dapat memasukkan nilai energi atau usaha gravitasi secara langsung untuk mencari ketinggian (h1) maupun kelajuan (v1, v2, v3):
+          </p>
+
+          <div class="fields-grid">
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpEP1">Energi Potensial Puncak (Ep1)</label>
+                <span class="unit-tag tag-ep">Joule</span>
+              </div>
+              <input type="number" id="inpEP1" min="0" step="10" value="3360" />
+              <small class="calc-hint">Menghitung ketinggian h1 = Ep1 / (m × g)</small>
+            </div>
+
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpEK1">Energi Kinetik Puncak (Ek1)</label>
+                <span class="unit-tag tag-ek">Joule</span>
+              </div>
+              <input type="number" id="inpEK1" min="0" step="10" value="640" />
+              <small class="calc-hint">Menghitung kelajuan awal v1 = √(2 × Ek1 / m)</small>
+            </div>
+
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpEM1">Energi Mekanik Puncak (Em1)</label>
+                <span class="unit-tag tag-em">Joule</span>
+              </div>
+              <input type="number" id="inpEM1" min="0" step="10" value="4000" />
+              <small class="calc-hint">Em1 = Ep1 + Ek1 = Ek2 di dasar sebelum direm</small>
+            </div>
+
+            <div class="field-item">
+              <div class="field-label-row">
+                <label for="inpEK3">Energi Kinetik Akhir (Ek3)</label>
+                <span class="unit-tag tag-ek">Joule</span>
+              </div>
+              <input type="number" id="inpEK3" min="0" step="10" value="1000" />
+              <small class="calc-hint">Menghitung kelajuan akhir v3 = √(2 × Ek3 / m)</small>
+            </div>
+
+            <div class="field-item field-wide">
+              <div class="field-label-row">
+                <label for="inpWg">Usaha Gravitasi (Wg)</label>
+                <span class="unit-tag tag-work">Joule</span>
+              </div>
+              <input type="number" id="inpWg" min="0" step="10" value="3360" />
+              <small class="calc-hint">Wg = Ep1 - Ep2 = m × g × h1. Mengubah Wg otomatis menyesuaikan h1 dan Ep1</small>
+            </div>
+          </div>
+
+          <div id="physicsWarning" class="physics-warning" hidden></div>
+        </div>
+      </section>
+
+      <!-- Right Column: CONTOH SOAL & PEMBAHASAN RAPIH -->
+      <section class="card-section panel-soal" aria-label="Contoh Soal dan Pembahasan">
+        <div class="section-header-bar">
+          <span class="section-tag">SOAL &amp; PENYELESAIAN</span>
+          <h2 class="section-heading">Contoh Soal &amp; Pembahasan</h2>
+        </div>
+
+        <!-- Problem Statement -->
+        <div class="soal-box">
+          <p class="soal-text">
+            Di puncak turunan, sepeda dan pengendaranya (massa total <strong class="hl-val" id="txtMass">80 kg</strong>) melaju <strong class="hl-val" id="txtV1">4 m/s</strong>. Mereka meluncur tanpa mengayuh dari ketinggian <strong class="hl-val" id="txtH1">4,2 m</strong>. Di jalan datar, pengendara mengerem hingga kelajuannya <strong class="hl-val" id="txtV3">5 m/s</strong>. Gunakan <strong class="hl-val">g = <span id="txtG">10</span> m/s²</strong> dan <strong>h = 0</strong> di dasar. Abaikan hambatan udara, hambatan gulir, dan energi rotasi roda.
+          </p>
+          <ol class="soal-questions" type="a">
+            <li>Berapa energi potensial, kinetik, dan mekanik di puncak?</li>
+            <li>Berapa usaha gravitasi dan kelajuan sepeda di dasar sebelum direm?</li>
+            <li>Berapa energi kinetik akhir sepeda setelah direm di jalan datar?</li>
+          </ol>
+        </div>
+
+        <!-- Clean Textbook-style Step-by-Step Solution matching the user's screenshot -->
+        <div class="pembahasan-container">
+          <div class="pembahasan-header">
+            <h3>Penyelesaian Langkah demi Langkah</h3>
+            <span class="live-tag">Terhitung Otomatis</span>
+          </div>
+
+          <!-- Diketahui Block -->
+          <div class="step-section">
+            <h4 class="step-section-title">Diketahui:</h4>
+            <ul class="diketahui-list">
+              <li>Massa total (m) = <strong id="dikM">80 kg</strong></li>
+              <li>Percepatan gravitasi (g) = <strong id="dikG">10 m/s²</strong></li>
+              <li>Ketinggian di puncak (h1) = <strong id="dikH1">4,2 m</strong></li>
+              <li>Ketinggian di dasar (h2) = <strong>0 m</strong></li>
+              <li>Kelajuan awal di puncak (v1) = <strong id="dikV1">4 m/s</strong></li>
+              <li>Kelajuan akhir setelah direm (v3) = <strong id="dikV3">5 m/s</strong></li>
+            </ul>
+          </div>
+
+          <!-- Jawaban a -->
+          <div class="step-section">
+            <h4 class="step-section-title">a. Energi potensial, kinetik, dan mekanik di puncak</h4>
+            <ol class="step-numbered-list">
+              <li>
+                <div class="step-item-title">Energi Potensial (Ep1)</div>
+                <div class="math-steps" id="mathEp1">
+                  <div>Ep1 = m × g × h1</div>
+                  <div>Ep1 = 80 × 10 × 4,2</div>
+                  <div class="math-result">Ep1 = <strong>3.360 J</strong></div>
+                </div>
+              </li>
+              <li>
+                <div class="step-item-title">Energi Kinetik (Ek1)</div>
+                <div class="math-steps" id="mathEk1">
+                  <div>Ek1 = 1/2 × m × v1²</div>
+                  <div>Ek1 = 1/2 × 80 × 4²</div>
+                  <div>Ek1 = 40 × 16</div>
+                  <div class="math-result">Ek1 = <strong>640 J</strong></div>
+                </div>
+              </li>
+              <li>
+                <div class="step-item-title">Energi Mekanik (Em1)</div>
+                <div class="math-steps" id="mathEm1">
+                  <div>Em1 = Ep1 + Ek1</div>
+                  <div>Em1 = 3.360 + 640</div>
+                  <div class="math-result">Em1 = <strong>4.000 J</strong></div>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Jawaban b -->
+          <div class="step-section">
+            <h4 class="step-section-title">b. Usaha gravitasi dan kelajuan di dasar sebelum direm</h4>
+            <ol class="step-numbered-list">
+              <li>
+                <div class="step-item-title">Usaha Gravitasi (Wg)</div>
+                <div class="math-steps" id="mathWg">
+                  <div>Wg = Ep1 - Ep2</div>
+                  <div>Wg = 3.360 - (80 × 10 × 0)</div>
+                  <div>Wg = 3.360 - 0</div>
+                  <div class="math-result">Wg = <strong>3.360 J</strong></div>
+                </div>
+              </li>
+              <li>
+                <div class="step-item-title">Kelajuan di Dasar Sebelum Direm (v2)</div>
+                <div class="math-steps" id="mathV2">
+                  <div>Ek2 = Ek1 + Wg</div>
+                  <div>Ek2 = 640 + 3.360</div>
+                  <div>Ek2 = <strong>4.000 J</strong></div>
+                  <div class="math-spacer"></div>
+                  <div>Ek2 = 1/2 × m × v2²</div>
+                  <div>4.000 = 1/2 × 80 × v2²</div>
+                  <div>4.000 = 40 × v2²</div>
+                  <div>v2² = 4.000 / 40</div>
+                  <div>v2² = 100</div>
+                  <div>v2 = √100</div>
+                  <div class="math-result">v2 = <strong>10 m/s</strong></div>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Jawaban c -->
+          <div class="step-section">
+            <h4 class="step-section-title">c. Energi kinetik akhir sepeda setelah direm di jalan datar</h4>
+            <ol class="step-numbered-list">
+              <li>
+                <div class="step-item-title">Energi Kinetik Akhir (Ek3)</div>
+                <div class="math-steps" id="mathEk3">
+                  <div>Ek3 = 1/2 × m × v3²</div>
+                  <div>Ek3 = 1/2 × 80 × 5²</div>
+                  <div>Ek3 = 40 × 25</div>
+                  <div class="math-result">Ek3 = <strong>1.000 J</strong></div>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- SECTION 3: EXPERIMENT LOG TABLE (TABEL DATA PERCOBAAN) -->
+    <section class="card-section panel-table" aria-label="Tabel Data Percobaan">
+      <div class="table-header-row">
+        <div>
+          <span class="section-tag">DATA LABORATORIUM</span>
+          <h2 class="section-heading">Tabel Data Percobaan Praktikum</h2>
+          <p class="panel-intro">Catat berbagai variasi percobaan untuk membandingkan pengaruh massa, ketinggian, dan kelajuan terhadap usaha dan energi.</p>
+        </div>
+        <div class="table-actions">
+          <button id="btnAddTrialBottom" class="btn-sim btn-primary">＋ Tambah Data Saat Ini</button>
+          <button id="btnClearTable" class="btn-sim btn-outline">🗑 Kosongkan Tabel</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="lab-table" id="trialTable">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>m (kg)</th>
+              <th>h1 (m)</th>
+              <th>v1 (m/s)</th>
+              <th>Ep1 (J)</th>
+              <th>Ek1 (J)</th>
+              <th>Em1 (J)</th>
+              <th>Wg (J)</th>
+              <th>v2 Dasar (m/s)</th>
+              <th>v3 Akhir (m/s)</th>
+              <th>Ek3 (J)</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="trialTableBody">
+            <!-- Populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
