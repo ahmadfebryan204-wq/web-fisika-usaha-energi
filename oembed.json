@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "provider_name": "Laboratorium Virtual Fisika",
+  "provider_url": "https://ahmadfebryan204-wq.github.io/web-fisika-usaha-energi/",
+  "title": "Praktikum 04 — Usaha dan Energi: Sepeda di Jalan Menurun",
+  "author_name": "Praktikum Fisika",
+  "author_url": "https://ahmadfebryan204-wq.github.io/web-fisika-usaha-energi/",
+  "html": "<iframe src=\"https://ahmadfebryan204-wq.github.io/web-fisika-usaha-energi/\" width=\"1280\" height=\"800\" style=\"border:0; width:100%; height:100%;\" allowfullscreen allow=\"fullscreen\"></iframe>",
+  "width": 1280,
+  "height": 800
+}
